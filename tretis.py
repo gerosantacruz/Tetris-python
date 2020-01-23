@@ -208,7 +208,7 @@ def draw_grid(surface, row, col):
    for i in range(row):
        pygame.draw.line(surface, (128,128,128), (sx, sy + i*block_size), (sx + play_width, sy + i*block_size))
        for j in range(col):
-           pygame.draw.line(surface, (128,128,128), (sx + i*block_size, sy), ( sx + i*block_size, sy + play_width)) 
+           pygame.draw.line(surface, (128,128,128), (sx + j*block_size, sy), ( sx + j*block_size, sy + play_height)) 
 
 
 def clear_rows(grid, locked):
