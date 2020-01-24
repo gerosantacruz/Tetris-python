@@ -197,8 +197,11 @@ def get_shape():
     return Piece(5,0, random.choice(shapes))
 
 
-def draw_text_middle(text, size, color, surface):
-    pass
+def draw_text_middle(surface, text, size, color):
+    font = pygame.font.SysFont('consolas', size, bold=True)
+    label = font.render(text, 1, color)
+
+    surface.blit(label, (top_left_x + play_width /2 - (label.get_width()/2), top_left_y + play_height/2 - label.get_height()/2))
 
 
 def draw_grid(surface, row, col):
@@ -225,11 +228,12 @@ def clear_rows(grid, locked):
                     continue
 
     if inc > 0:
-        for key in sorted(list(locked), key= lambda x:x[1])[::-1]:
+        for key in sorted(list(locked), key= lambda x: x[1])[::-1]:
             x,y = key
             if y < ind:
                 newKey = (x,y + inc)
                 locked[newKey] = locked.pop(key)
+
     return inc
 
 
@@ -250,7 +254,7 @@ def draw_next_shape(shape, surface):
     
     surface.blit(label, (sx + 10, sy - 30))
 
-def draw_window(surface, grid, score):
+def draw_window(surface, grid, score = 0):
     surface.fill((0,0,0))
 
     pygame.font.init()
@@ -306,7 +310,7 @@ def main(win):
         if level_time/1000 >15:
             level_time = 0
             if fall_speed > 0.12:
-                fall_speed -= 0.01
+                fall_speed += 0.01
 
 
         if fall_time/1000 >= fall_speed:
@@ -360,9 +364,11 @@ def main(win):
             current_piece = next_piece
             next_piece = get_shape()
             change_piece = False
-            score += clear_rows(grid, locked_positions) * 10
+            
             # call four times to check for multiple clear rows
-            clear_rows(grid, locked_positions)
+            #clear_rows(grid, locked_positions)
+
+            score += int(clear_rows(grid, locked_positions)) * 10
  
         draw_window(win, grid, score)
         draw_next_shape(next_piece, win)
@@ -370,12 +376,25 @@ def main(win):
  
         # Check if user lost
         if check_lost(locked_positions):
+            draw_text_middle(win, "GAME OVER", 80, (255,255,255))
+            pygame.display.update()
+            pygame.time.delay(2000)
             run = False
 
 
 def main_menu(win):
-    main(win)
-    
+    run = True
+    while run:
+        win.fill((0,0,0))
+        draw_text_middle(win, 'Press any key to play', 60, (255,255,255))
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            if event.type == pygame.KEYDOWN:
+                main(win)
+   
+    pygame.display.quit()
 
 
 win = pygame.display.set_mode((s_width, s_height))
